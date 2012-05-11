@@ -1,0 +1,1 @@
+curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{Status:"P1", RemainingLOE__c:"5.0", Rank:"1", taskid="12345"}'  http://localhost:3002/tasks
