@@ -68,6 +68,8 @@ app.get('/', routes.index);
 
 // creates a task
 app.post('/va/tasks', function(req, res){
+	
+	
 	require('mongodb').connect(mongourl, function(err, conn){
 	  conn.collection('tasks', function(err, coll){
 	    coll.insert( req.body, {safe:true}, function(err){
@@ -75,10 +77,41 @@ app.post('/va/tasks', function(req, res){
 			  "Content-Type": "application/json",
 			  "Access-Control-Allow-Origin": "*"
 			});
-			res.end(JSON.stringify(req.body));
+			//console.log(JSON.stringify(req.body));
+			var body = JSON.stringify(req.body);
+			var parsejson = JSON.parse(body);
+			console.log('err =  ' + err);
+			
+			console.log (parsejson);
+			var idpos = body.indexOf("_id");
+			var bodylen = body.length;
+			console.log ('Id at position' + idpos + ' ' + body.substr(idpos + 6) );
+			var _id = body.substr(idpos + 6);
+			var endpos = _id.indexOf("}");
+			
+			var parseid = _id.substr(0, endpos - 1);
+			console.log (parseid);			
+			
+			res.end(JSON.stringify([{"status":"SUCCESS"}, {"data":[{"id":parseid}]}]));
 	    });
 	  });
-	});
+	}); 
+	/*
+	console.log('before require');
+	require('mongodb').connect(mongourl, function(err, conn){
+	    console.log('after connect ');
+	  conn.collection('tasks', function(err, coll){
+	    console.log ('after collection');
+	    coll.insert( req.body, {safe:true}, function(err){
+		console.log ('in insert');
+			res.writeHead(200, {
+			  "Content-Type": "application/json",
+			  "Access-Control-Allow-Origin": "*"
+			});
+			res.end(JSON.stringify("test"));
+	    });
+	  });
+	}); */
  });
 
 
@@ -90,16 +123,26 @@ app.put('/va/tasks/:task_id', function(req, res){
 	var ObjectID = require('mongodb').ObjectID;
 	
 	require('mongodb').connect(mongourl, function(err, conn){
+	 
 	  conn.collection('tasks', function(err, coll){
+	     
 	    coll.findAndModify({'_id':new ObjectID(req.params.task_id)}, [['name','asc']], { $set: req.body }, {}, function(err, document) {
-			res.writeHead(200, {
-			  "Content-Type": "application/json",
-			  "Access-Control-Allow-Origin": "*"
-			});
-			res.end(JSON.stringify(document));
+	    
+	      res.writeHead(200, {
+		"Content-Type": "application/json",
+		"Access-Control-Allow-Origin": "*"
+	      });
+	      
+	      res.end(JSON.stringify([{"status":"SUCCESS"}, {"data":[{"id":req.params.task_id}]}]));
+	      
+	      
 	    });
+	    
 	  });
+	  
 	});
+	
+	
 
  });
 
@@ -120,161 +163,23 @@ app.get('/va/tasks', function(req, res){
 	    });
 	  });
 	});
-
- });
-
+});
 
 
 
-// creates a location
-app.post('/v.1/locations', function(req, res){
-	require('mongodb').connect(mongourl, function(err, conn){
-	  conn.collection('locations', function(err, coll){
-	    coll.insert( req.body, {safe:true}, function(err){
-			res.writeHead(200, {
-			  "Content-Type": "application/json",
-			  "Access-Control-Allow-Origin": "*"
-			});
-			res.end(JSON.stringify(req.body));
-	    });
-	  });
-	});
- });
-
-// returns list of locations
-app.get('/v.1/locations', function(req, res){
-
-	require('mongodb').connect(mongourl, function(err, conn){
-	  conn.collection('locations', function(err, coll){
-	    coll.find(function(err, cursor) {
-			cursor.toArray(function(err, items) {
-				res.writeHead(200, {
-				  "Content-Type": "application/json",
-				  "Access-Control-Allow-Origin": "*"
-				});
-				res.end(JSON.stringify(items));
-			});
-	    });
-	  });
-	});
-
- });
-
-// returns list of favorite locations for a user
-app.get('/v.1/locations/favorites', function(req, res){
-
-	res.writeHead(200, {
-	  "Content-Type": "application/json",
-	  "Access-Control-Allow-Origin": "*"
-	});
-
-	res.end(JSON.stringify({"results":"todo"}));
-
- });
-
-// creates a new favorite for a user
-app.post('/v.1/locations/favorites', function(req, res){
-
-	res.writeHead(200, {
-	  "Content-Type": "application/json",
-	  "Access-Control-Allow-Origin": "*"
-	});
-
-	res.end(JSON.stringify({"results":"todo"}));
-
- });
-
-// returns a location
-app.get('/v.1/locations/:location_id', function(req, res){
+// delete task
+app.delete('/va/tasks/:task_id', function(req, res){
 
 	var ObjectID = require('mongodb').ObjectID;
 	
 	require('mongodb').connect(mongourl, function(err, conn){
-	  conn.collection('locations', function(err, coll){
-	    coll.findOne({'_id':new ObjectID(req.params.location_id)}, function(err, document) {
+	  conn.collection('tasks', function(err, coll){
+	    coll.remove({'_id':new ObjectID(req.params.task_id)}, {safe:true}, function(err, document) {
 			res.writeHead(200, {
 			  "Content-Type": "application/json",
 			  "Access-Control-Allow-Origin": "*"
 			});
-			res.end(JSON.stringify(document));
-	    });
-	  });
-	});
-	
- });
-
-// creates a new facility for a location
-app.post('/v.1/locations/:location_id/facilities', function(req, res){
-	
-	// add the location id to the json
-	var facility = req.body;
-	facility['location'] = req.params.location_id;
-
-	require('mongodb').connect(mongourl, function(err, conn){
-	  conn.collection('facilities', function(err, coll){
-	    coll.insert( facility, {safe:true}, function(err){
-			res.writeHead(200, {
-			  "Content-Type": "application/json",
-			  "Access-Control-Allow-Origin": "*"
-			});
-			res.end(JSON.stringify(facility));
-	    });
-	  });
-	});
-
- });
-
-// returns a list of facilities for a location
-app.get('/v.1/locations/:location_id/facilities', function(req, res){
-
-	require('mongodb').connect(mongourl, function(err, conn){
-	  conn.collection('facilities', function(err, coll){
-	    coll.find({location:req.params.location_id}, function(err, cursor) {
-			cursor.toArray(function(err, items) {
-				res.writeHead(200, {
-				  "Content-Type": "application/json",
-				  "Access-Control-Allow-Origin": "*"
-				});
-				res.end(JSON.stringify(items));
-			});
-	    });
-	  });
-	});
-
- });
-
-// returns a facility
-app.get('/v.1/locations/:location_id/facilities/:facility_id', function(req, res){
-
-	var ObjectID = require('mongodb').ObjectID;
-	
-	require('mongodb').connect(mongourl, function(err, conn){
-	  conn.collection('facilities', function(err, coll){
-	    coll.findOne({'_id':new ObjectID(req.params.facility_id)}, function(err, document) {
-			res.writeHead(200, {
-			  "Content-Type": "application/json",
-			  "Access-Control-Allow-Origin": "*"
-			});
-			res.end(JSON.stringify(document));
-	    });
-	  });
-	});
-
- });
-
-// updates a facility
-app.put('/v.1/locations/:location_id/facilities/:facility_id', function(req, res){
-
-	var ObjectID = require('mongodb').ObjectID;
-	
-	require('mongodb').connect(mongourl, function(err, conn){
-	  conn.collection('facilities', function(err, coll){
-	    coll.findAndModify({'_id':new ObjectID(req.params.facility_id)}, [['name','asc']], { $set: req.body }, {}, function(err, document) {
-			res.writeHead(200, {
-			  "Content-Type": "application/json",
-			  "Access-Control-Allow-Origin": "*"
-			});
-			res.end(JSON.stringify(document));
+			res.end(JSON.stringify([{"status":"SUCCESS"}]));
 	    });
 	  });
 	});
