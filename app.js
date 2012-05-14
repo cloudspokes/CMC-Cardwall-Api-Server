@@ -7,7 +7,7 @@ var express = require('express')
   , routes = require('./routes')
 
 var app = module.exports = express.createServer();
-var port = (process.env.VMC_APP_PORT || 3002);
+var port = process.env.PORT || 3002;
 var host = (process.env.VCAP_APP_HOST || 'localhost');
 
 if(process.env.VCAP_SERVICES){
