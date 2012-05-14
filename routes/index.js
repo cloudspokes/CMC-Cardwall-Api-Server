@@ -4,5 +4,5 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Chow Finder' })
+  res.render('index', { title: 'CMC Cardwall' })
 };
