@@ -1,1 +1,10 @@
-curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"Status":"P1","RemainingLOE__c":"5", "Rank":"1", "taskid":"12345"}'  http://localhost:3002/tasks
+curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"Status":"Planned","RemainingLOE__c":"5", "Rank":"1", "Task_Number__c":"12345", "Task_Name__c":"Implement security on cardwall","Priority__c":"P1","EstimatedLOE__c":"4","Story__c":"S-51654"}'  http://localhost:3002/tasks
+
+curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"Status":"In Progress","RemainingLOE__c":"4", "Rank":"2", "Task_Number__c":"123456", "Task_Name__c":"Implement grouping of tasks by story.","Priority__c":"P1","EstimatedLOE__c":"5","Story__c":"S-51654"}'  http://localhost:3002/tasks
+
+curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"Status":"Draft","RemainingLOE__c":"0", "Rank":"1", "Task_Number__c":"123457", "Task_Name__c":"Implement cardwall navigation.","Priority__c":"P1","EstimatedLOE__c":"0","Story__c":"S-51655"}'  http://localhost:3002/tasks
+
+curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"Status":"Ready for Review","RemainingLOE__c":"0", "Rank":"1", "Task_Number__c":"123459", "Task_Name__c":"Create Images for cardwall.","Priority__c":"P1","EstimatedLOE__c":"0","Story__c":"S-51655"}'  http://localhost:3002/tasks
+
+curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"Status":"Complete","RemainingLOE__c":"0", "Rank":"1", "Task_Number__c":"123460", "Task_Name__c":"Create design of Cardwall.","Priority__c":"P1","EstimatedLOE__c":"0","Story__c":"S-51655"}'  http://localhost:3002/tasks
+
